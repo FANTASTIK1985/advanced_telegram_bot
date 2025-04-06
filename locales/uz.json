@@ -1,0 +1,9 @@
+{
+  "start": "Assalomu alaykum! Turizm botga xush kelibsiz!",
+  "order_now": "Buyurtma berish uchun /order buyrug'ini bosing.",
+  "choose_language": "Iltimos, tilni tanlang.",
+  "enter_name": "Iltimos, ismingizni kiriting:",
+  "enter_phone": "Telefon raqamingizni kiriting:",
+  "enter_service": "Qanday xizmat kerakligini yozing:",
+  "order_saved": "Buyurtmangiz saqlandi:\nIsm: {name}\nTelefon: {phone}\nXizmat: {service}"
+}

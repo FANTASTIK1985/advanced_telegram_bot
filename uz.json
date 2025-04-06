@@ -1,0 +1,8 @@
+{
+    "welcome": "Assalomu alaykum! Mening yordamimda O'zbekiston Respublikasi, Navoiy viloyati, Nurato tumanida joylashgan go'zal, so'lim va betakror Sintob qishlog'iga sayohat uyushtirishingiz mumkin!",
+    "order_now": "Buyurtma berish uchun /order buyrug'ini yuboring",
+    "enter_name": "Ismingizni kiriting",
+    "enter_phone": "Telefon raqamingizni kiriting",
+    "enter_service": "Sayohat turini tanlang",
+    "order_saved": "Buyurtmangiz qabul qilindi! \nIsm: {name}\nTelefon: {phone}\nXizmat: {service}"
+}

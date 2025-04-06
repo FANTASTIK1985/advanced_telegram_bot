@@ -1,5 +1,9 @@
 {
-  "start": "Hello! Welcome to Tourism Bot!",
-  "order": "Place an order",
-  "language": "Choose language"
+  "start": "Hello! Welcome to the Tourism Bot!",
+  "order_now": "Click /order to place an order.",
+  "choose_language": "Please choose a language.",
+  "enter_name": "Please enter your name:",
+  "enter_phone": "Please enter your phone number:",
+  "enter_service": "What service would you like to order?",
+  "order_saved": "Your order has been saved:\nName: {name}\nPhone: {phone}\nService: {service}"
 }

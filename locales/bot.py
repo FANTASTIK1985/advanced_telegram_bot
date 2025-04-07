@@ -2,15 +2,16 @@ import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import json
 import os
-from localization import Localization  # Siz allaqachon tayyorlagan fayl
+from localization import Localization  # Bu fayl alohida bo'lishi kerak
 
-TOKEN = '7504532103:AAGHjCUVbe6wktF7Ym2zCMKJz1fdMOKISrQ'  # Bu yerga tokeningizni yozing
+# Tokeningiz shu yerda:
+TOKEN = '7504532103:AAGHjCUVbe6wktF7Ym2zCMKJz1fdMOKISrQ'
 bot = telebot.TeleBot(TOKEN)
 
 LANG_FILE = 'user_lang.json'
 ORDER_FILE = 'orders.json'
 
-# User languages
+# === User Language Functions ===
 def load_user_lang():
     if os.path.exists(LANG_FILE):
         with open(LANG_FILE, 'r', encoding='utf-8') as f:
@@ -27,34 +28,31 @@ def get_localized(user_id):
     lang = user_langs.get(str(user_id), 'uz')
     return Localization(lang)
 
-# Salomlashish har doim boshida
+# === Welcome & Language Selection ===
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     welcome_text = (
         "Assalomu alaykum! Mening yordamimda O'zbekiston Respublikasi, "
         "Navoiy viloyati, Nurato tumanida joylashgan go'zal, so'lim va betakror "
         "Sintob qishlog'iga sayohat uyushtirishingiz mumkin!\n\n"
-        "Iltimos, tilni tanlang:"
+        "👉 1. Tilni tanlang:"
     )
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add("🇺🇿 O'zbekcha", "🇷🇺 Русский", "🇬🇧 English")
     bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
 
-# Til tanlash
 @bot.message_handler(func=lambda m: m.text in ["🇺🇿 O'zbekcha", "🇷🇺 Русский", "🇬🇧 English"])
 def language_selected(message):
     user_id = str(message.from_user.id)
-    user_langs[user_id] = (
-        "uz" if "O'zbekcha" in message.text else
-        "ru" if "Русский" in message.text else
-        "en"
-    )
+    lang_code = "uz" if "O'zbekcha" in message.text else "ru" if "Русский" in message.text else "en"
+    user_langs[user_id] = lang_code
     save_user_lang(user_langs)
     l10n = get_localized(user_id)
+
     bot.send_message(message.chat.id, l10n.t("welcome"))
     bot.send_message(message.chat.id, l10n.t("order_now"))
 
-# Buyurtma bosqichlari
+# === Order Process ===
 user_steps = {}
 
 @bot.message_handler(commands=['order'])
@@ -102,21 +100,28 @@ def save_order(user_id, order):
     with open(ORDER_FILE, 'w', encoding='utf-8') as f:
         json.dump(orders, f, indent=2)
 
-# Tarixni tozalash
+# === Clear History ===
 @bot.message_handler(commands=['clear'])
 def clear_history(message):
     user_id = str(message.from_user.id)
     if user_id in user_steps:
         del user_steps[user_id]
-
-    start_button = KeyboardButton(text="BOSHLASH")
-    markup = ReplyKeyboardMarkup(resize_keyboard=True).add(start_button)
-
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add(KeyboardButton("BOSHLASH"))
     bot.send_message(message.chat.id, "Tarix tozalandi! Iltimos, boshlash uchun tugmani bosing.", reply_markup=markup)
 
-# BOSHLASH tugmasi
-@bot.message_handler(func=lambda message: message.text == "BOSHLASH")
-def restart(message):
+# === BOSHLASH ===
+@bot.message_handler(func=lambda m: m.text == "BOSHLASH")
+def restart_bot(message):
     send_welcome(message)
 
+# === Fallback: Unknown Messages ===
+@bot.message_handler(func=lambda m: True)
+def fallback(message):
+    if message.text not in ["BOSHLASH", "/start", "/order", "/clear", "🇺🇿 O'zbekcha", "🇷🇺 Русский", "🇬🇧 English"]:
+        markup = ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.add(KeyboardButton("BOSHLASH"))
+        bot.send_message(message.chat.id, "Botni qayta boshlash uchun 'BOSHLASH' tugmasini bosing.", reply_markup=markup)
+
+# === Start Bot ===
 bot.polling()

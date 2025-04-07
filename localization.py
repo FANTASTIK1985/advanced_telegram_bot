@@ -1,37 +1,34 @@
-import json
-import os
+# localization.py
 
 class Localization:
-    def __init__(self, lang='uz'):
+    def __init__(self, lang):
         self.lang = lang
-        self.translations = self.load_language(lang)
-
-    def load_language(self, lang):
-        """Til faylini yuklash."""
-        try:
-            # Til faylini yuklash
-            with open(os.path.join('locales', f'{lang}.json'), 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except FileNotFoundError:
-            # Fayl topilmasa, xatolik xabarini chiqarish
-            print(f"Til fayli {lang}.json topilmadi! Standart tilga o'ting.")
-            # Standart tilga o'tish (masalan, o'zbekcha)
-            return self.load_language('uz')
-        except json.JSONDecodeError:
-            # Fayl noto'g'ri formatda bo'lsa
-            print(f"{lang}.json fayli formatda xatolik bor!")
-            return {}
-
-    def set_language(self, lang):
-        """Yangi tilni o'rnatish."""
-        self.lang = lang
-        self.translations = self.load_language(lang)
+        self.translations = {
+            'uz': {
+                'welcome': "Xush kelibsiz!",
+                'order_now': "Buyurtma berishni boshlash uchun /order ni bosing.",
+                'enter_name': "Ismingizni kiriting:",
+                'enter_phone': "Telefon raqamingizni kiriting:",
+                'enter_service': "Qaysi xizmatdan foydalanmoqchisiz?",
+                'order_saved': "Buyurtmangiz saqlandi:\nIsm: {name}\nTel: {phone}\nXizmat: {service}",
+            },
+            'ru': {
+                'welcome': "Добро пожаловать!",
+                'order_now': "Чтобы начать заказ, нажмите /order.",
+                'enter_name': "Введите ваше имя:",
+                'enter_phone': "Введите номер телефона:",
+                'enter_service': "Какие услуги вы хотите?",
+                'order_saved': "Ваш заказ сохранён:\nИмя: {name}\nТел: {phone}\nУслуга: {service}",
+            },
+            'en': {
+                'welcome': "Welcome!",
+                'order_now': "To place an order, type /order.",
+                'enter_name': "Please enter your name:",
+                'enter_phone': "Please enter your phone number:",
+                'enter_service': "Which service do you want?",
+                'order_saved': "Your order has been saved:\nName: {name}\nPhone: {phone}\nService: {service}",
+            }
+        }
 
     def t(self, key):
-        """Xabarni tarjima qilish."""
-        return self.translations.get(key, key)
-
-# Test qilish uchun, misol:
-localizer = Localization('en')  # Default til - inglizcha
-
-print(localizer.t('welcome'))  # welcome xabarini chiqaradi
+        return self.translations.get(self.lang, {}).get(key, key)

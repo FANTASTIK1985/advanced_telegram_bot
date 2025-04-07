@@ -74,7 +74,7 @@ pydantic_core==2.23.4
 Pygments==2.19.1
 pyparsing==3.2.3
 PySocks==1.7.1
-pyTelegramBotAPI==4.26.0
+pyTelegramBotAPI==4.26.0  # faqat bitta versiya kiritilgan
 pytesseract==0.3.13
 python-dotenv==1.1.0
 python-telegram-bot==13.15
@@ -100,7 +100,7 @@ tqdm==4.67.1
 trio==0.29.0
 trio-websocket==0.12.2
 typer==0.15.1
-typing_extensions==4.7.1
+typing_extensions>=4.11  # yangilangan versiya
 tzdata==2025.2
 tzlocal==5.3.1
 uritemplate==4.1.1

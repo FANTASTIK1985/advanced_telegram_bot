@@ -2,15 +2,15 @@ import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 import json
 import os
-from localization import Localization
+from localization import Localization  # Siz allaqachon tayyorlagan fayl
 
-TOKEN = '7504532103:AAGHjCUVbe6wktF7Ym2zCMKJz1fdMOKISrQ'
+TOKEN = '7504532103:AAGHjCUVbe6wktF7Ym2zCMKJz1fdMOKISrQ'  # Bu yerga tokeningizni yozing
 bot = telebot.TeleBot(TOKEN)
 
 LANG_FILE = 'user_lang.json'
 ORDER_FILE = 'orders.json'
 
-# 🧠 User languages
+# User languages
 def load_user_lang():
     if os.path.exists(LANG_FILE):
         with open(LANG_FILE, 'r', encoding='utf-8') as f:
@@ -23,19 +23,24 @@ def save_user_lang(data):
 
 user_langs = load_user_lang()
 
-# 🌐 Localized loader
 def get_localized(user_id):
     lang = user_langs.get(str(user_id), 'uz')
     return Localization(lang)
 
-# 🚀 START
+# Salomlashish har doim boshida
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
+    welcome_text = (
+        "Assalomu alaykum! Mening yordamimda O'zbekiston Respublikasi, "
+        "Navoiy viloyati, Nurato tumanida joylashgan go'zal, so'lim va betakror "
+        "Sintob qishlog'iga sayohat uyushtirishingiz mumkin!\n\n"
+        "Iltimos, tilni tanlang:"
+    )
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     markup.add("🇺🇿 O'zbekcha", "🇷🇺 Русский", "🇬🇧 English")
-    bot.send_message(message.chat.id, "Tilni tanlang / Choose language / Выберите язык:", reply_markup=markup)
+    bot.send_message(message.chat.id, welcome_text, reply_markup=markup)
 
-# 🌐 Language selection
+# Til tanlash
 @bot.message_handler(func=lambda m: m.text in ["🇺🇿 O'zbekcha", "🇷🇺 Русский", "🇬🇧 English"])
 def language_selected(message):
     user_id = str(message.from_user.id)
@@ -49,7 +54,7 @@ def language_selected(message):
     bot.send_message(message.chat.id, l10n.t("welcome"))
     bot.send_message(message.chat.id, l10n.t("order_now"))
 
-# 📦 Buyurtma bosqichlari
+# Buyurtma bosqichlari
 user_steps = {}
 
 @bot.message_handler(commands=['order'])
@@ -59,12 +64,9 @@ def start_order(message):
     user_steps[user_id] = {'step': 'name', 'data': {}}
     bot.send_message(message.chat.id, l10n.t("enter_name"))
 
-@bot.message_handler(func=lambda m: True)
+@bot.message_handler(func=lambda m: str(m.from_user.id) in user_steps)
 def handle_order_steps(message):
     user_id = str(message.from_user.id)
-    if user_id not in user_steps:
-        return
-
     l10n = get_localized(user_id)
     step_info = user_steps[user_id]
 
@@ -90,16 +92,31 @@ def handle_order_steps(message):
         )
         del user_steps[user_id]
 
-# 📁 Buyurtmalarni saqlash
 def save_order(user_id, order):
     if os.path.exists(ORDER_FILE):
         with open(ORDER_FILE, 'r', encoding='utf-8') as f:
             orders = json.load(f)
     else:
         orders = {}
-
     orders[user_id] = order
     with open(ORDER_FILE, 'w', encoding='utf-8') as f:
         json.dump(orders, f, indent=2)
+
+# Tarixni tozalash
+@bot.message_handler(commands=['clear'])
+def clear_history(message):
+    user_id = str(message.from_user.id)
+    if user_id in user_steps:
+        del user_steps[user_id]
+
+    start_button = KeyboardButton(text="BOSHLASH")
+    markup = ReplyKeyboardMarkup(resize_keyboard=True).add(start_button)
+
+    bot.send_message(message.chat.id, "Tarix tozalandi! Iltimos, boshlash uchun tugmani bosing.", reply_markup=markup)
+
+# BOSHLASH tugmasi
+@bot.message_handler(func=lambda message: message.text == "BOSHLASH")
+def restart(message):
+    send_welcome(message)
 
 bot.polling()

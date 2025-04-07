@@ -4,7 +4,7 @@ import json
 import os
 from localization import Localization  # Siz allaqachon tayyorlagan fayl
 
-TOKEN = '7504532103:AAGHjCUVbe6wktF7Ym2zCMKJz1fdMOKISrQ'
+TOKEN = '7504532103:AAEDqnJ8XndUucOB5v-58dJKT0Miz-BN_fg'
 bot = telebot.TeleBot(TOKEN)
 
 LANG_FILE = 'user_lang.json'
